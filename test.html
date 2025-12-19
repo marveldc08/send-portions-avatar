@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Send Portions – Christmas Avatar</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <style>
+    :root {
+      --green: #1db954;
+      --dark-green: #128c3f;
+      --gold: #ffd864;
+      --red: #c62828;
+      --glass: rgba(255, 255, 255, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: linear-gradient(135deg, #0f5132, #1db954, #ffd864);
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+      color: #222;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 420px;
+      background: var(--glass);
+      backdrop-filter: blur(14px);
+      border-radius: 22px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+      padding: 20px;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    nav img {
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      border: 3px solid var(--gold);
+      background: #fff;
+    }
+
+    nav h2 {
+      font-size: 1.4rem;
+      margin: 0;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.95);
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+
+    h3 {
+      margin-top: 0;
+      font-size: 1.1rem;
+      text-align: center;
+      color: #333;
+    }
+
+    select, input[type="file"], button {
+      width: 100%;
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 15px;
+      border: 1px solid #ddd;
+    }
+
+    select {
+      background: #fff;
+    }
+
+    button {
+      background: linear-gradient(135deg, var(--green), var(--dark-green));
+      color: #fff;
+      border: none;
+      font-weight: 600;
+      box-shadow: 0 6px 14px rgba(29,185,84,0.4);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(29,185,84,0.6);
+    }
+
+    .flyer-container {
+      position: relative;
+      width: 100%;
+      max-width: 360px;
+      margin: 0 auto;
+      display: none;
+    }
+
+    .flyer {
+      width: 100%;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    .avatar {
+      position: absolute;
+      /* top: 60px;
+      right: 18px; */
+      top: 56px;
+      right: 16px;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      overflow: hidden;
+      background: #eee;
+      border: 4px solid var(--gold);
+      touch-action: none;
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      cursor: grab;
+      transform-origin: center;
+    }
+
+    .controls {
+      display: none;
+      margin-top: 12px;
+    }
+
+    .controls label {
+      font-size: 0.85rem;
+      color: #555;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #fff;
+      opacity: 0.9;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 768px) {
+        .app{
+            width: 100%;
+            /* max-width: 900px !important; */
+        }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+
+  <nav>
+    <img src="assets/ICM100.png" alt="logo">
+    <h2>Send Portions - BLW ZONE J🎄</h2>
+  </nav>
+
+  <div class="card">
+    <h3>How many children do you want to feed this Christmas?</h3>
+
+    <select id="childrenCount">
+      <option value="">Select an option</option>
+      <option value="50">50 Children</option>
+      <option value="100">100 Children</option>
+      <option value="500">500 Children</option>
+      <option value="1000">1000 Children</option>
+      <option value="2000">2000 Children</option>
+      <option value="5000">5000 Children</option>
+    </select>
+
+    <input type="file" accept="image/*" id="upload" style="display:none" />
+  </div>
+
+  <div class="card">
+    <div class="flyer-container" id="flyerToDownload">
+      <img id="flyerImage" class="flyer" />
+      <div class="avatar" id="avatar">
+        <img id="avatarPreview" />
+      </div>
+    </div>
+
+    <div class="controls" id="controls">
+      <label>Zoom Avatar</label>
+      <input type="range" id="zoomControl" min="1" max="3" step="0.1" value="1">
+    </div>
+
+    <button id="downloadBtn" style="display:none">Download Your Avatar 🤗🎁</button>
+  </div>
+
+  <footer>
+    Together, we can feed more children this Christmas ❤️
+  </footer>
+
+</div>
+
+<script>
+  const childrenSelect = document.getElementById("childrenCount");
+  const flyerContainer = document.getElementById("flyerToDownload");
+  const flyerImage = document.getElementById("flyerImage");
+  const upload = document.getElementById("upload");
+  const avatar = document.getElementById("avatar");
+  const avatarImg = document.getElementById("avatarPreview");
+  const zoomControl = document.getElementById("zoomControl");
+  const controls = document.getElementById("controls");
+  const downloadBtn = document.getElementById("downloadBtn");
+
+  const flyerMap = {
+    50: "assets/ICM50.png",
+    100: "assets/ICM100.png",
+    500: "assets/ICM500.png",
+    1000: "assets/ICM1000.png",
+    2000: "assets/ICM2000.png",
+    5000: "assets/ICM5000.png"
+  };
+
+  let posX = 0, posY = 0, scale = 1;
+  let dragging = false, startX = 0, startY = 0;
+
+  childrenSelect.addEventListener("change", function () {
+    flyerImage.src = flyerMap[this.value];
+    flyerContainer.style.display = "block";
+    upload.style.display = "block";
+    controls.style.display = "block";
+    downloadBtn.style.display = "block";
+  });
+
+  upload.addEventListener("change", function () {
+    const reader = new FileReader();
+    reader.onload = () => {
+      avatarImg.src = reader.result;
+      posX = posY = 0;
+      scale = 1;
+      zoomControl.value = 1;
+      updateTransform();
+    };
+    reader.readAsDataURL(this.files[0]);
+  });
+
+  zoomControl.addEventListener("input", function () {
+    scale = this.value;
+    updateTransform();
+  });
+
+  avatar.addEventListener("pointerdown", e => {
+    dragging = true;
+    startX = e.clientX - posX;
+    startY = e.clientY - posY;
+  });
+
+  window.addEventListener("pointermove", e => {
+    if (!dragging) return;
+    posX = e.clientX - startX;
+    posY = e.clientY - startY;
+    updateTransform();
+  });
+
+  window.addEventListener("pointerup", () => dragging = false);
+
+  function updateTransform() {
+    avatarImg.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+  }
+
+  downloadBtn.addEventListener("click", () => {
+    html2canvas(flyerContainer, { scale: 2 }).then(canvas => {
+      const link = document.createElement("a");
+      link.download = "send_portions_avatar.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    });
+  });
+</script>
+
+</body>
+</html>

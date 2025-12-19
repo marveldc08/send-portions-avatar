@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Send Portions – Avatar Flyer</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <style>
+    :root {
+      --green: #1db954;
+      --dark: #0f172a;
+      --light: #f8fafc;
+      --gold: #ffd864;
+      --card: rgba(255,255,255,0.9);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: linear-gradient(135deg, #0f5132, #1db954);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 16px;
+      color: #0f172a;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 420px;
+      background: var(--card);
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: 0 20px 50px rgba(0,0,0,.25);
+    }
+
+    /* NAV */
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .logo {
+      width: 50px;
+      height: 90px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    nav h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    /* HEADLINE */
+    h3 {
+      font-size: 1rem;
+      margin: 12px 0;
+      text-align: center;
+      color: #171d2fea;
+    }
+
+    /* FORM */
+    select, button, input[type="range"] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      font-size: 15px;
+      margin-top: 12px;
+    }
+
+    select {
+      background: white;
+    }
+
+    button {
+      background: var(--green);
+      color: white;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform .2s, box-shadow .2s;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(29,185,84,.35);
+    }
+
+    /* FLYER */
+    .flyer-container {
+      position: relative;
+      width: 100%;
+      margin-top: 18px;
+      display: none;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+
+    .flyer {
+      width: 100%;
+      display: block;
+    }
+
+    /* AVATAR */
+    .avatar {
+      position: absolute;
+       top: 61px;
+      right: 16px;
+      width: 158px;
+      height: 158px;
+      /* top: 17%;
+      right: 5%;
+      width: 38%; */
+      /* height: 39%; */
+      /* aspect-ratio: 1/1; */
+      border-radius: 50%;
+      overflow: hidden;
+      background: #e5e7eb;
+      touch-action: none;
+      border: 2px solid var(--gold);
+      box-shadow: 0 8px 20px rgba(0,0,0,.25);
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      cursor: grab;
+      transform-origin: center;
+    }
+
+    /* CONTROLS */
+    .controls {
+      display: none;
+      margin-top: 14px;
+    }
+
+    .controls label {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    /* FOOTER BTN */
+    #downloadBtn {
+      display: none;
+      margin-top: 16px;
+    }
+
+    @media screen and (max-width:344px) {
+        .avatar{
+         top: 46px;
+         right: 13px;
+         width: 113px;
+          height: 113px;
+        }
+    }
+
+    /* TABLET */
+    @media screen and (min-width: 768px) and (max-width: 1023px) {
+        .app {
+            max-width: 640px;
+            padding: 20px;
+        }
+
+        nav h2 {
+            font-size: 1.4rem;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+        }
+
+        .flyer-container {
+            margin-top: 24px;
+        }
+
+        .avatar {
+            top: 61px;
+            right: 16px;
+            width: 220px;
+            height: 220px;
+        }
+
+        button {
+            font-size: 16px;
+            padding: 14px;
+        }
+    }
+
+
+    /* DESKTOP ENHANCEMENT */
+    @media (min-width: 768px) {
+      body {
+        align-items: center;
+      }
+
+      .app {
+        max-width: 520px;
+        padding: 24px;
+      }
+
+      h3 {
+        font-size: 1.1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <nav>
+    <img class="logo" src="assets/Zone J logo.png" alt="logo">
+    <h2> BLW ZONE J - Send Portions🎄</h2>
+  </nav>
+
+  <h3>How many children would you feed this Christmas? 🎄</h3>
+
+  <select id="childrenCount">
+    <option value="">Select number of children</option>
+    <option value="50">50 Children</option>
+    <option value="100">100 Children</option>
+    <option value="500">500 Children</option>
+    <option value="1000">1000 Children</option>
+    <option value="2000">2000 Children</option>
+    <option value="5000">5000 Children</option>
+  </select>
+
+  <input type="file" accept="image/*" id="upload" hidden />
+
+  <div class="flyer-container" id="flyerToDownload">
+    <img id="flyerImage" class="flyer" />
+    <div class="avatar" id="avatar">
+      <img id="avatarPreview" />
+    </div>
+  </div>
+
+  <div class="controls" id="controls">
+    <label>Zoom Avatar</label>
+    <input type="range" id="zoomControl" min="1" max="3" step="0.1" value="1">
+  </div>
+
+  <button id="downloadBtn" style="display:none">Download Your Avatar 🤗🎁</button>
+
+
+</div>
+   <!-- <footer>
+    Together, we can feed more children this Christmas ❤️
+  </footer> -->
+
+<script>
+  const childrenSelect = document.getElementById("childrenCount");
+  const flyerContainer = document.getElementById("flyerToDownload");
+  const flyerImage = document.getElementById("flyerImage");
+  const upload = document.getElementById("upload");
+  const avatar = document.getElementById("avatar");
+  const avatarImg = document.getElementById("avatarPreview");
+  const zoomControl = document.getElementById("zoomControl");
+  const controls = document.getElementById("controls");
+  const downloadBtn = document.getElementById("downloadBtn");
+
+  const flyerMap = {
+    50: "assets/ICM50.png",
+    100: "assets/ICM100.png",
+    500: "assets/ICM500.png",
+    1000: "assets/ICM1000.png",
+    2000: "assets/ICM2000.png",
+    5000: "assets/ICM5000.png"
+  };
+
+  let posX = 0, posY = 0, scale = 1;
+  let dragging = false, startX = 0, startY = 0;
+
+  childrenSelect.addEventListener("change", () => {
+    if (!childrenSelect.value) return;
+    flyerImage.src = flyerMap[childrenSelect.value];
+    flyerContainer.style.display = "block";
+    upload.click();
+    controls.style.display = "block";
+    downloadBtn.style.display = "block";
+  });
+
+  upload.addEventListener("change", () => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      avatarImg.src = reader.result;
+      posX = posY = 0;
+      scale = 1;
+      zoomControl.value = 1;
+      updateTransform();
+    };
+    reader.readAsDataURL(upload.files[0]);
+  });
+
+  zoomControl.addEventListener("input", () => {
+    scale = zoomControl.value;
+    updateTransform();
+  });
+
+  avatar.addEventListener("pointerdown", e => {
+    dragging = true;
+    startX = e.clientX - posX;
+    startY = e.clientY - posY;
+  });
+
+  window.addEventListener("pointermove", e => {
+    if (!dragging) return;
+    posX = e.clientX - startX;
+    posY = e.clientY - startY;
+    updateTransform();
+  });
+
+  window.addEventListener("pointerup", () => dragging = false);
+
+  function updateTransform() {
+    avatarImg.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+  }
+
+  downloadBtn.addEventListener("click", () => {
+    html2canvas(flyerContainer, { scale: 2 }).then(canvas => {
+      const link = document.createElement("a");
+      link.download = "send_portions_flyer.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    });
+  });
+</script>
+
+</body>
+</html>
