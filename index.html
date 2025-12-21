@@ -236,6 +236,10 @@
     <option value="2000">2000 Children</option>
     <option value="5000">5000 Children</option>
   </select>
+  <button id="uploadBtn" style="display:none">
+    Select Photo 📸
+  </button>
+
 
   <input type="file" accept="image/*" id="upload" hidden />
 
@@ -259,7 +263,7 @@
     Together, we can feed more children this Christmas ❤️
   </footer> -->
 
-<script>
+<!-- <script>
   const childrenSelect = document.getElementById("childrenCount");
   const flyerContainer = document.getElementById("flyerToDownload");
   const flyerImage = document.getElementById("flyerImage");
@@ -327,6 +331,106 @@
     avatarImg.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
   }
 
+  downloadBtn.addEventListener("click", () => {
+    html2canvas(flyerContainer, { scale: 2 }).then(canvas => {
+      const link = document.createElement("a");
+      link.download = "send_portions_flyer.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    });
+  });
+</script> -->
+
+    <script>
+  const childrenSelect = document.getElementById("childrenCount");
+  const flyerContainer = document.getElementById("flyerToDownload");
+  const flyerImage = document.getElementById("flyerImage");
+  const upload = document.getElementById("upload");
+  const uploadBtn = document.getElementById("uploadBtn");
+  const avatar = document.getElementById("avatar");
+  const avatarImg = document.getElementById("avatarPreview");
+  const zoomControl = document.getElementById("zoomControl");
+  const controls = document.getElementById("controls");
+  const downloadBtn = document.getElementById("downloadBtn");
+
+  const flyerMap = {
+    50: "assets/ICM50.png",
+    100: "assets/ICM100.png",
+    500: "assets/ICM500.png",
+    1000: "assets/ICM1000.png",
+    2000: "assets/ICM2000.png",
+    5000: "assets/ICM5000.png"
+  };
+
+  let posX = 0, posY = 0, scale = 1;
+  let dragging = false, startX = 0, startY = 0;
+
+  /* STEP 1 — SELECT CHILDREN */
+  childrenSelect.addEventListener("change", () => {
+    const value = childrenSelect.value;
+    if (!value) return;
+
+    flyerImage.src = flyerMap[value];
+    flyerContainer.style.display = "block";
+    uploadBtn.style.display = "block";
+
+    // Reset previous state
+    avatarImg.src = "";
+    controls.style.display = "none";
+    downloadBtn.style.display = "none";
+  });
+
+  /* STEP 2 — USER CLICKS UPLOAD BUTTON */
+  uploadBtn.addEventListener("click", () => {
+    upload.click(); // ✅ iOS-safe (direct user action)
+  });
+
+  /* STEP 3 — IMAGE SELECTED */
+  upload.addEventListener("change", () => {
+    if (!upload.files[0]) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      avatarImg.src = reader.result;
+      posX = posY = 0;
+      scale = 1;
+      zoomControl.value = 1;
+      updateTransform();
+
+      controls.style.display = "block";
+      downloadBtn.style.display = "block";
+    };
+    reader.readAsDataURL(upload.files[0]);
+  });
+
+  /* DRAG AVATAR */
+  avatar.addEventListener("pointerdown", e => {
+    dragging = true;
+    startX = e.clientX - posX;
+    startY = e.clientY - posY;
+  });
+
+  window.addEventListener("pointermove", e => {
+    if (!dragging) return;
+    posX = e.clientX - startX;
+    posY = e.clientY - startY;
+    updateTransform();
+  });
+
+  window.addEventListener("pointerup", () => dragging = false);
+
+  /* ZOOM */
+  zoomControl.addEventListener("input", () => {
+    scale = zoomControl.value;
+    updateTransform();
+  });
+
+  function updateTransform() {
+    avatarImg.style.transform =
+      `translate(${posX}px, ${posY}px) scale(${scale})`;
+  }
+
+  /* DOWNLOAD */
   downloadBtn.addEventListener("click", () => {
     html2canvas(flyerContainer, { scale: 2 }).then(canvas => {
       const link = document.createElement("a");
