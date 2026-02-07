@@ -443,7 +443,7 @@
       downloadBtn.addEventListener("click", () => {
         html2canvas(flyerContainer, { scale: 2 }).then((canvas) => {
           const link = document.createElement("a");
-          link.download = "send_portions_flyer.png";
+          link.download = "avatar_flyer.png";
           link.href = canvas.toDataURL("image/png");
           link.click();
         });
